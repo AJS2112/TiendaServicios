@@ -1,3 +1,9 @@
+using FluentValidation.AspNetCore;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using TiendaServicios.Api.Autor.Application;
+using TiendaServicios.Api.Autor.Repository;
+
 namespace TiendaServicios.Api.Autor
 {
     public class Program
@@ -9,6 +15,21 @@ namespace TiendaServicios.Api.Autor
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddDbContext<ContextoAutor>(options =>
+            {
+                options.UseNpgsql(builder.Configuration.GetConnectionString("ConexionDatabase"),
+                    options => options.SetPostgresVersion(new Version(9, 6)));
+            });
+
+            //MediatR
+            builder.Services.AddMediatR(typeof(Nuevo.Handler).Assembly);
+
+            //FluentValidation
+            builder.Services.AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<Nuevo>());
+
+            //AutoMapper
+            builder.Services.AddAutoMapper(typeof(Consulta.Handler));
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -32,4 +53,4 @@ namespace TiendaServicios.Api.Autor
             app.Run();
         }
     }
-}
+};
