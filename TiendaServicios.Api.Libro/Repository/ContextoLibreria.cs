@@ -5,8 +5,12 @@ namespace TiendaServicios.Api.Libro.Repository
 {
     public class ContextoLibreria : DbContext
     {
+        public ContextoLibreria()
+        {
+
+        }
         public ContextoLibreria(DbContextOptions options) : base(options){}
 
-        public DbSet<LibreriaMaterial> LibreriasMateriales { get; set; }
+        public virtual DbSet<LibreriaMaterial> LibreriasMateriales { get; set; }
     }
 }
