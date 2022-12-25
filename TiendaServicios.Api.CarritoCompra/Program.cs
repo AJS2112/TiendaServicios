@@ -2,6 +2,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TiendaServicios.Api.CarritoCompra.Application;
 using TiendaServicios.Api.CarritoCompra.Repository;
+using TiendaServicios.Api.CarritoCompra.ResourceInterfaces;
+using TiendaServicios.Api.CarritoCompra.ResourceServices;
 
 namespace TiendaServicios.Api.CarritoCompra
 {
@@ -21,6 +23,13 @@ namespace TiendaServicios.Api.CarritoCompra
             });
 
             builder.Services.AddMediatR(typeof(Nuevo.Handler).Assembly);
+
+            builder.Services.AddHttpClient("Libros", config =>
+            {
+                config.BaseAddress = new Uri(builder.Configuration["Services:Libros"]);
+            });
+
+            builder.Services.AddScoped<ILibrosService, LibrosService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
