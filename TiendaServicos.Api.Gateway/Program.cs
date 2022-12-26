@@ -1,5 +1,8 @@
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using TiendaServicos.Api.Gateway.MessageHandler;
+using TiendaServicos.Api.Gateway.ResourceImplementations;
+using TiendaServicos.Api.Gateway.ResourceInterfaces;
 
 namespace TiendaServicos.Api.Gateway
 {
@@ -12,7 +15,15 @@ namespace TiendaServicos.Api.Gateway
             // Add services to the container.
 
             //builder.Services.AddControllers();
-            builder.Services.AddOcelot();
+            builder.Services.AddOcelot()
+                .AddDelegatingHandler<LibroHandler>();
+
+            builder.Services.AddHttpClient("AutorService", config =>
+            {
+                config.BaseAddress = new Uri(builder.Configuration["Services:Autor"]);
+            });
+
+            builder.Services.AddSingleton<IAutorResource, AutorResource>();    
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
