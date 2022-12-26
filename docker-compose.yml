@@ -18,9 +18,16 @@ services:
       context: .
       dockerfile: TiendaServicios.Api.CarritoCompra/Dockerfile
 
+  tiendaservicos.api.gateway:
+    image: ${DOCKER_REGISTRY-}tiendaservicosapigateway
+    build:
+      context: .
+      dockerfile: TiendaServicos.Api.Gateway/Dockerfile
+
 networks:
   default:
     external:
       name: tiendaservicosnet
+
 
 
