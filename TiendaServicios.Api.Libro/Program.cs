@@ -3,6 +3,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TiendaServicios.Api.Libro.Application;
 using TiendaServicios.Api.Libro.Repository;
+using TiendaServicios.RabbitMQ.Bus.BusRabbit;
+using TiendaServicios.RabbitMQ.Bus.Implementations;
 
 namespace TiendaServicios.Api.Libro
 {
@@ -24,6 +26,12 @@ namespace TiendaServicios.Api.Libro
             builder.Services.AddMediatR(typeof(Nuevo.Handler).Assembly);
 
             builder.Services.AddAutoMapper(typeof(Consulta.Query));
+
+            builder.Services.AddSingleton<IRabbitEventBus, RabbitEventBus>(sp =>
+            {
+                var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
+                return new RabbitEventBus(sp.GetService<IMediator>(), scopeFactory);
+            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

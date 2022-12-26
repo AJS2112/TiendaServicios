@@ -2,7 +2,11 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TiendaServicios.Api.Autor.Application;
+using TiendaServicios.Api.Autor.RabbitMqHandler;
 using TiendaServicios.Api.Autor.Repository;
+using TiendaServicios.RabbitMQ.Bus.BusRabbit;
+using TiendaServicios.RabbitMQ.Bus.EventQueue;
+using TiendaServicios.RabbitMQ.Bus.Implementations;
 
 namespace TiendaServicios.Api.Autor
 {
@@ -30,6 +34,16 @@ namespace TiendaServicios.Api.Autor
             //AutoMapper
             builder.Services.AddAutoMapper(typeof(Consulta.Handler));
 
+            builder.Services.AddSingleton<IRabbitEventBus, RabbitEventBus>(sp =>
+            {
+                var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
+                return new RabbitEventBus(sp.GetService<IMediator>(), scopeFactory);
+            });
+
+            builder.Services.AddTransient<EmailEventoHandler>();
+
+            builder.Services.AddTransient<IEventoHandler<EmailEventoQueue>, EmailEventoHandler>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -49,6 +63,9 @@ namespace TiendaServicios.Api.Autor
 
 
             app.MapControllers();
+
+            var eventBus = app.Services.GetRequiredService<IRabbitEventBus>();
+            eventBus.Subscribe<EmailEventoQueue, EmailEventoHandler>();
 
             app.Run();
         }
